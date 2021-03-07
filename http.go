@@ -1,7 +1,9 @@
 package panggilhttp
 
 import (
+	"bytes"
 	"encoding/json"
+	"io"
 	"log"
 	"mime/multipart"
 	"net/http"
@@ -130,6 +132,29 @@ func (c *Config) SendFormData(fd map[string]string) *Config {
 
 	for key, val := range fd {
 		c.writer.WriteField(key, val)
+	}
+
+	return c
+}
+
+// SendFile to send file with POST, PUT or PATCH method.
+func (c *Config) SendFile(key, filename string, file []byte) *Config {
+	if c.body.Len() == 0 {
+		c.writer = multipart.NewWriter(&c.body)
+	}
+
+	if file == nil {
+		log.Fatal("File cannot be nil")
+	}
+
+	form, e := c.writer.CreateFormFile(key, filename)
+	if e != nil {
+		log.Fatalf("Create form error: %s", e)
+	}
+
+	r := bytes.NewReader(file)
+	if _, e := io.Copy(form, r); e != nil {
+		log.Fatalf("Write form file error: %s", e)
 	}
 
 	return c
