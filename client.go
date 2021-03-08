@@ -92,9 +92,9 @@ func (c *Config) Do() (Response, error) {
 
 		// If the HTTP request uses HTTP retry, if HTTP is failed will be retrying.
 		finalResp, e := retry.New(&retry.Config{
-			Timeouts:      c.timeout,
-			RetryAttempts: c.retryAttempt,
-			Interval:      c.retryInterval,
+			Timeouts: c.timeout,
+			Attempts: c.retryAttempt,
+			Interval: c.retryInterval,
 		}).Do(c.req, resp, c.client)
 		if e != nil && e.Error() != "Request Timeout" {
 			return Response{}, e
