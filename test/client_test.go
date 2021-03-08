@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"github.com/KodepandaID/panggilhttp"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestMethodGET(t *testing.T) {
@@ -27,6 +28,66 @@ func TestMethodGET(t *testing.T) {
 	if e != nil {
 		t.Fatal(e)
 	}
+}
+
+func TestMethodGETWithMerge(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/hotel-destination" {
+			w.WriteHeader(http.StatusOK)
+			w.Header().Add("Content-Type", "application/json")
+			w.Write([]byte(`{"id_hotel": 25,"name": "Hotel California","destination_id": 123}`))
+		} else if r.URL.Path == "/destinations" {
+			w.WriteHeader(http.StatusOK)
+			w.Header().Add("Content-Type", "application/json")
+			w.Write([]byte(`{"destination_id": 123,"destinations": ["LAX", "SFO", "OAK"], "flights": [{"plane": "ABC", "departured": "09:00"}, {"plane": "DEF", "departured": "07:00"}], "informations": {"total_population": 11000, "total_land_area": 120000, "average_temperatures": {"morning": "20c", "night": "13c"}}}`))
+		}
+	}))
+	defer ts.Close()
+
+	client := panggilhttp.New()
+
+	resp, e := client.
+		Get(ts.URL+"/hotel-destination", nil, nil).
+		Get(ts.URL+"/destinations", []string{"flights", "informations"}, nil).
+		Do()
+	if e != nil {
+		t.Fatal(e)
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		t.Fatal("HTTP request failed")
+	}
+
+	type Flights struct {
+		Plane      string `json:"plane"`
+		Departured string `json:"departured"`
+	}
+
+	type Informations struct {
+		TotalPopulation     int `json:"total_population"`
+		AverageTemperatures struct {
+			Morning string `json:"morning"`
+			Night   string `json:"night"`
+		} `json:"average_temperatures"`
+	}
+
+	type Hotels struct {
+		IDHotel       int          `json:"id_hotel"`
+		DestinationID int          `json:"destination_id"`
+		Name          string       `json:"name"`
+		Destinations  []string     `json:"destinations"`
+		Flights       []Flights    `json:"flights"`
+		Informations  Informations `json:"informations"`
+	}
+
+	var h Hotels
+	json.Unmarshal(resp.Body, &h)
+
+	assert.Equal(t, 25, h.IDHotel)
+	assert.Equal(t, 123, h.DestinationID)
+	assert.Equal(t, 2, len(h.Flights))
+	assert.Equal(t, 11000, h.Informations.TotalPopulation)
+	assert.Equal(t, "20c", h.Informations.AverageTemperatures.Morning)
 }
 
 func TestMethodPOST(t *testing.T) {
