@@ -2,6 +2,7 @@
 ![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/KodepandaID/panggilhttp)
 ![GitHub](https://img.shields.io/github/license/KodepandaID/panggilhttp)
 ![](https://github.com/KodepandaID/panggilhttp/workflows/Go/badge.svg)
+[![Coverage Status](https://coveralls.io/repos/github/KodepandaID/panggilhttp/badge.svg?branch=main)](https://coveralls.io/github/KodepandaID/panggilhttp?branch=main)
 
 An enhanced HTTP client for Go with features likes:
 - Support call GET Method more than 1 URL and merged the response body.
