@@ -5,7 +5,7 @@
 
 An enhanced HTTP client for Go with features likes:
 - Support call GET Method more than 1 URL and merged the response body.
-- Set which values from the response body to show with Wishlist or Blacklist.
+- Set which values from the response body to show with Withelist or Blacklist.
 - HTTP retry if failed, with attempts and interval configuration.
 
 ## Installation
