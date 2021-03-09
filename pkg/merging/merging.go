@@ -49,11 +49,11 @@ func (m *Config) MergeFromWhitelist(whitelist []string, b []byte) {
 			m.data[field] = s
 		case fastjson.TypeNumber:
 			if floatRegex.MatchString(v.Get(field).String()) {
-				m.data[field] = v.GetInt64(field)
+				m.data[field] = v.GetFloat64(field)
 			}
 
 			if intRegex.MatchString(v.Get(field).String()) {
-				m.data[field] = v.GetFloat64(field)
+				m.data[field] = v.GetInt64(field)
 			}
 		case fastjson.TypeTrue, fastjson.TypeFalse:
 			m.data[field] = v.GetBool(field)
@@ -116,8 +116,6 @@ func sliceCheckType(value *fastjson.Value) string {
 		}
 	case fastjson.TypeTrue, fastjson.TypeFalse:
 		return "boolean"
-	case fastjson.TypeArray:
-		return "array"
 	case fastjson.TypeObject:
 		return "object"
 	}
